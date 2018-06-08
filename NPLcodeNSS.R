@@ -68,15 +68,6 @@ free %>%
   with(wordcloud(lemma, n, max.words = 100, random.order = FALSE,  rot.per = 0))
 
 # And we can visualise word frequency by groups:
-
-free %>%
-  mutate (Carer = case_when (Carer == "Not A Carer" ~ "Not Identified as a Carer",
-                             Carer == "Not Sure" ~ "Not Identified as a Carer",
-                             Carer == "Carer" ~ "Identified as a Carer")) %>%
-  count (word, Carer, sort = TRUE) %>%
-  acast (word ~ Carer, value.var = "n", fill = 0) %>%
-  comparison.cloud (colors = c("#00325F", "#FF0000"), max.words = 100)
-
 # What do students in CAHSS and CSE talk about positively?
 free %>%
   filter (College != "CMVM") %>%
