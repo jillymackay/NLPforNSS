@@ -8,7 +8,7 @@ library(readxl)
 
 
 # I download all the free text comments from 2018 into a folder in my working directory
-# Except ECN, ENG and LAW which need column adjustment
+# Except ECN, ENG and LAW which need column adjustment - ISSUE TO FIX
 # The following function reads all of those files at once, but doesn't create multiple data objects
 
 read.multiple <- function() {
@@ -28,7 +28,6 @@ lazytf <- function (data, word = "word", grouping_factor) {
     bind_tf_idf (., !!word, !!qgv, n)
   
 }
-# this command is for some reasonr eading in bio multiple times
 
 NSS.2018 <- read.multiple() %>%
   mutate (CaseID = row_number()) %>%
