@@ -28,6 +28,7 @@ lazytf <- function (data, word = "word", grouping_factor) {
     bind_tf_idf (., !!word, !!qgv, n)
   
 }
+setwd("M:/Data/NSS/2018")
 
 NSS.2018 <- read.multiple() %>%
   mutate (CaseID = row_number()) %>%
@@ -65,6 +66,49 @@ NSS.2018 <- read.multiple() %>%
   anti_join(stop_words)
 
 
+NSS.2018 %>%
+  filter (answer == "Positive") %>%
+  count (lemma, sort = TRUE) %>%
+  top_n (20) %>%
+  mutate(text_order = nrow(.):1) %>%
+  ggplot(aes(reorder(lemma, text_order), n, fill = lemma)) +
+  geom_bar (stat = "identity") +
+  labs (x = "Word", y = "Frequency in Positive comments, Edinburgh 2018") +
+  coord_flip() +
+  theme_classic() + 
+  theme (legend.position = "none")
+
+
+pos <- NSS.2018 %>%
+  filter (answer == "Positive") %>%
+  group_by (School) %>%
+  summarise (totaln = n())
+
+pos2 <- NSS.2018 %>%
+  filter (answer == "Positive") %>%
+  group_by(School) %>%
+  count (lemma, sort = TRUE) %>%
+  ungroup () 
+
+pos3 <- left_join(pos2, pos)
+
+pos3 %>%
+  mutate (propn = n/totaln) %>%
+  arrange (desc (propn)) %>% 
+  mutate (lemma = factor (lemma, levels = rev(unique(lemma)))) %>%
+  group_by (School) %>%
+  top_n(3, propn) %>%
+  ungroup() %>%
+  ggplot(aes(lemma, propn, fill = School)) +
+  geom_col(show.legend = FALSE) +
+  labs (x = NULL, y = NULL,
+        title = "Most common word (as a proportion of school words) in positive comments to NSS 2018") +
+  facet_wrap(~School, ncol = 4, scales = "free") +
+  theme_classic() +
+  coord_flip()
+  
+
+
 # Are schools doing something uniquely well?
 positivecomments <- NSS.2018 %>%
   filter (answer == "Positive")
@@ -75,7 +119,7 @@ comment_pos %>%
   arrange(desc (tf_idf)) %>%
   mutate (lemma = factor (lemma, levels = rev(unique(lemma)))) %>%
   group_by (School) %>%
-  top_n(5, tf_idf) %>%
+  top_n(2, tf_idf) %>%
   ungroup() %>%
   ggplot(aes(lemma, tf_idf, fill = School)) +
   geom_col(show.legend = FALSE) +
